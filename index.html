@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radi and Luna Collision Animation</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            overflow: hidden;
+        }
+        #canvas {
+            position: relative;
+            border: 1px solid black;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        #text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            color: black;
+            font-family: 'Arial', sans-serif;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <div id="text">fuck you 🎀</div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Radi (square) properties
+        const radi = {
+            x: 100,
+            y: 100,
+            size: 50,
+            color: 'blue',
+            dx: 1, // velocity in x direction
+            dy: 1  // velocity in y direction
+        };
+
+        // Luna (ball) properties
+        const luna = {
+            x: 600,
+            y: 600,
+            radius: 25,
+            color: 'red',
+            dx: -1, // velocity in x direction
+            dy: -1  // velocity in y direction
+        };
+
+        function drawSquare() {
+            ctx.fillStyle = radi.color;
+            ctx.fillRect(radi.x, radi.y, radi.size, radi.size);
+        }
+
+        function drawBall() {
+            ctx.fillStyle = luna.color;
+            ctx.beginPath();
+            ctx.arc(luna.x, luna.y, luna.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function checkCollision() {
+            const squareLeft = radi.x;
+            const squareRight = radi.x + radi.size;
+            const squareTop = radi.y;
+            const squareBottom = radi.y + radi.size;
+
+            const ballLeft = luna.x - luna.radius;
+            const ballRight = luna.x + luna.radius;
+            const ballTop = luna.y - luna.radius;
+            const ballBottom = luna.y + luna.radius;
+
+            return squareLeft < ballRight &&
+                   squareRight > ballLeft &&
+                   squareTop < ballBottom &&
+                   squareBottom > ballTop;
+        }
+
+        function displayText() {
+            const text = document.getElementById('text');
+            text.style.opacity = '1'; // Fade in the text
+        }
+
+        function burstEffect() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            for (let i = 0; i < 10; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const x = luna.x + Math.cos(angle) * 50;
+                const y = luna.y + Math.sin(angle) * 50;
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+            // Update positions
+            radi.x += radi.dx;
+            radi.y += radi.dy;
+            luna.x += luna.dx;
+            luna.y += luna.dy;
+
+            drawSquare();
+            drawBall();
+
+            // Check for collision
+            if (checkCollision()) {
+                burstEffect(); // Create burst effect
+                displayText(); // Show the text
+                return; // Stop the animation on collision
+            }
+
+            requestAnimationFrame(animate); // Continue animation
+        }
+
+        animate(); // Start the animation
+    </script>
+</body>
+</html>
